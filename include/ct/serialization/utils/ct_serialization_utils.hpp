@@ -38,7 +38,7 @@ struct sizeofs_maker< ct::utils::List<Types...> >
 namespace tests {
 
 using input_t = std::tuple< std::pair<std::int16_t, std::int16_t>, std::int16_t, std::array<std::int32_t,4> >;
-constexpr auto sizeofs = sizeofs_maker< ct::flatten_trait< input_t >::type >::get_sizeofs();
+constexpr auto sizeofs = sizeofs_maker< ct::flattened< input_t >::type >::get_sizeofs();
 
 static_assert( ct::equal( sizeofs, std::array<std::size_t, 4>{2,2,2, 16}), "Test failed");
 
@@ -51,7 +51,7 @@ template <typename ... Types>
 struct flat_offsets_maker
 {
     // Convenient shortcut-aliases
-    using sizeofs_maker_t = sizeofs_maker< typename ct::flatten_trait<Types...>::type >;
+    using sizeofs_maker_t = sizeofs_maker< typename ct::flattened<Types...>::type >;
 
     static constexpr std::size_t count = sizeofs_maker_t::count;
     using offsets_array_t = typename sizeofs_maker_t::sizeofs_array_t; // same as sizeofs array

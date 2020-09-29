@@ -8,6 +8,8 @@
 
 namespace ct {
 
+namespace impl {
+
 // Specialization for flatten'ing parameter pack: <Types...> -> List<Types...>
 template <typename ... Types>
 struct flatten_trait
@@ -56,30 +58,47 @@ struct flatten_trait< T[SIZE] > :
         >::type
 {};
 
+} // namespace impl
+
 // -----------------------------------------------------------------------------
 
+// Truly recursive flattening (dont be confused with impl::flatten_trait<Types...>)
+template <typename ... Types>
+struct flattened {
+    using type = typename impl::flatten_trait< typename impl::flatten_trait<Types>::type ...>::type;
+};
+
+// -----------------------------------------------------------------------------
+
+#if defined(CT_ENABLE_TESTS)
 namespace tests {
 
     // Pod types flatten'ing
-    static_assert( std::is_same< flatten_trait<bool, int, float>::type, ct::utils::List<bool, int, float> >::value, "Test failed");
+    static_assert( std::is_same< flattened<bool, int, float>::type, ct::utils::List<bool, int, float> >::value, "Test failed");
 
     // std::arrays flatten'ing
-    static_assert( std::is_same< flatten_trait< std::array<int, 3> >::type, ct::utils::List< std::array<int, 3> > >::value, "Test failed");  // Arrays of POD-types non-unpacked
-    static_assert( std::is_same< flatten_trait< std::array< std::pair<int,int>, 3> >::type, ct::utils::List<int,int,int,int,int,int> >::value, "Test failed"); // Arrays of Non-POD types unpacked
-    static_assert( std::is_same< flatten_trait< std::array< std::array<int, 3>, 2> >::type, ct::utils::List<std::array<int,3>, std::array<int,3>> >::value, "Test failed"); // Nested arrays unpacked
-    static_assert( std::is_same< flatten_trait< std::tuple< std::array<int, 2>, std::array<int, 3> > >::type, ct::utils::List<std::array<int,2>, std::array<int,3>> >::value, "Test failed"); // Nested arrays unpacked
-    static_assert( std::is_same< flatten_trait< std::tuple< std::array<int, 1>, std::array<int, 2>, std::array<int, 3> > >::type, ct::utils::List< std::array<int, 1>, std::array<int, 2>, std::array<int, 3> > >::value, "asd"); // Arrays of POD-types non-unpacked
+    static_assert( std::is_same< flattened< std::array<int, 3> >::type, ct::utils::List< std::array<int, 3> > >::value, "Test failed");  // Arrays of POD-types non-unpacked
+    static_assert( std::is_same< flattened< std::array< std::pair<int,int>, 3> >::type, ct::utils::List<int,int,int,int,int,int> >::value, "Test failed"); // Arrays of Non-POD types unpacked
+    static_assert( std::is_same< flattened< std::array< std::array<int, 3>, 2> >::type, ct::utils::List<std::array<int,3>, std::array<int,3>> >::value, "Test failed"); // Nested arrays unpacked
+    static_assert( std::is_same< flattened< std::tuple< std::array<int, 2>, std::array<int, 3> > >::type, ct::utils::List<std::array<int,2>, std::array<int,3>> >::value, "Test failed"); // Nested arrays unpacked
+    static_assert( std::is_same< flattened< std::tuple< std::array<int, 1>, std::array<int, 2>, std::array<int, 3> > >::type, ct::utils::List< std::array<int, 1>, std::array<int, 2>, std::array<int, 3> > >::value, "asd"); // Arrays of POD-types non-unpacked
 
     // std::pair and std::tuple flatten'ing
-    static_assert( std::is_same< flatten_trait< std::pair<int, float> >::type, ct::utils::List<int, float> >::value, "Test failed");
-    static_assert( std::is_same< flatten_trait< std::tuple<bool, int, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
-    static_assert( std::is_same< flatten_trait< std::pair<std::pair<bool, int>, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
-    static_assert( std::is_same< flatten_trait< std::tuple<std::tuple<bool, int>, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::pair<int, float> >::type, ct::utils::List<int, float> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::tuple<bool, int, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::pair<std::pair<bool, int>, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::tuple<std::tuple<bool, int>, float> >::type, ct::utils::List<bool, int, float> >::value, "Test failed");
 
     // Some extreme nesting test
-    static_assert ( std::is_same< flatten_trait< std::tuple< std::pair<bool, int>, float, std::array<int,4>> >::type, ct::utils::List<bool, int, float, std::array<int,4>> >::value, "asd");
+    static_assert ( std::is_same< flattened< std::tuple< std::pair<bool, int>, float, std::array<int,4>> >::type, ct::utils::List<bool, int, float, std::array<int,4>> >::value, "asd");
+
+    // Parameters pack test
+    static_assert( std::is_same< flattened< std::pair<bool, int>, std::pair<float, double> >::type, ct::utils::List<bool, int, float, double> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::pair<bool, int>, std::array<float,3> >::type, ct::utils::List<bool, int, std::array<float,3>> >::value, "Test failed");
+    static_assert( std::is_same< flattened< std::tuple<bool, int, float>, double >::type, ct::utils::List<bool, int, float, double> >::value, "Test failed");
 
 } // namespace tests
+#endif // defined(CT_ENABLE_TESTS)
 
 } // namespace ct
 

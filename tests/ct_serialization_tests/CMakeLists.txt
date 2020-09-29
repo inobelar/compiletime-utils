@@ -11,12 +11,15 @@ add_executable(ct_serialization_tests
 
 # ------------------------------------------------------------------------------
 
-# Note: Get directory above: https://stackoverflow.com/a/45650833/
+# Additionaly enable in-place compile-time tests
+add_definitions(-DCT_ENABLE_TESTS)
+
+# Note: How to get "directory above": https://stackoverflow.com/a/45650833/
 
 # Add Catch2 include directory into include pathes
 set(CATCH2_DIRECTORY get_filename_component(DIR_ONE_ABOVE ../catch2 ABSOLUTE) )
 target_include_directories(ct_serialization_tests PRIVATE ${CATCH2_DIRECTORY})
 
 # Add Library include directory into include pathes
-set(CATCH2_DIRECTORY get_filename_component(DIR_ONE_ABOVE ../../include ABSOLUTE) )
-target_include_directories(ct_serialization_tests PRIVATE ${CATCH2_DIRECTORY})
+set(LIBRARY_DIRECTORY get_filename_component(DIR_ONE_ABOVE ../../include ABSOLUTE) )
+target_include_directories(ct_serialization_tests PRIVATE ${LIBRARY_DIRECTORY})

@@ -9,7 +9,11 @@ TEST_CASE( "Compile-time offsets calculation works", "[ser/deser]")
     {
         constexpr auto offsets = ct::serialization::utils::offsets::get_offsets
         <
-            std::int8_t, std::int32_t, std::int32_t, std::array<std::int32_t, 3>, std::int64_t
+            std::int8_t,
+            std::int32_t,
+            std::int32_t,
+            std::array<std::int32_t, 3>,
+            std::int64_t
         >();
 
         REQUIRE( offsets.size() == 5 );
@@ -24,7 +28,9 @@ TEST_CASE( "Compile-time offsets calculation works", "[ser/deser]")
     {
         constexpr auto offsets = ct::serialization::utils::offsets::get_offsets
         <
-            std::pair<std::int32_t, std::int64_t>, std::tuple<std::int8_t, std::array<std::int16_t, 3>, std::int32_t>, std::int64_t
+            std::pair<std::int32_t, std::int64_t>,
+            std::tuple<std::int8_t, std::array<std::int16_t, 3>, std::int32_t>,
+            std::int64_t
         >();
 
         REQUIRE( offsets.size() == 3 );
@@ -111,7 +117,7 @@ TEST_CASE( "Simple Serialization/Deserialization works", "[ser/deser]" )
 
 }
 
-TEST_CASE( "Nested Serialization/Deserialization works", "[ser/deser]" )
+SCENARIO( "Nested Serialization/Deserialization works", "[ser/deser]" )
 {
     enum class dummy_enum { first = 0, second = 1, third = 2 };
 
@@ -144,85 +150,86 @@ TEST_CASE( "Nested Serialization/Deserialization works", "[ser/deser]" )
 
     // -------------------------------------------------------------------------
 
-    using byte_array_t = ct::serialization::byte_buffer_t<nested_value_t, array_t, value_t>;
-    byte_array_t bytes {0}; // Filled by zeroes, why not
-
-    // Packing
+    GIVEN( "Bytes buffer created before packing" )
     {
-        const nested_value_t nested_value
+        //
+        using byte_array_t = ct::serialization::byte_buffer_t<nested_value_t, array_t, value_t>;
+        byte_array_t bytes {0}; // Filled by zeroes, why not
+
+        WHEN( "Data being packed" )
         {
-            dummy_enum::second,
-            1,
+            // Visibility scope reduced
+            {
+                const nested_value_t nested_value
+                {
+                    dummy_enum::second,
+                    1,
 
-            {2, 3, 4},
-            { std::pair<int, short>{5, 6}, {7, 8}, {9, 10} },
+                    {2, 3, 4},
+                    { std::pair<int, short>{5, 6}, {7, 8}, {9, 10} },
 
-            {11, 12},
-            {13, { {14,15,16}, 17}},
+                    {11, 12},
+                    {13, { {14,15,16}, 17}},
 
-            {18, {19,20,21}, {22, 23}},
-        };
+                    {18, {19,20,21}, {22, 23}},
+                };
 
-        const array_t array {24, 25, 26};
+                const array_t array {24, 25, 26};
 
-        const value_t value = 27;
+                const value_t value = 27;
 
-        ct::serialization::pack_into(bytes.data(), nested_value /*, array, value*/);
+                // Data packing
+                ct::serialization::pack_into(bytes.data(), nested_value, array, value);
+            }
+
+            THEN( "Unpacking produces the same data")
+            {
+                nested_value_t nested_value;
+                array_t array;
+                value_t value;
+
+                ct::serialization::unpack_from(bytes.data(), nested_value, array, value);
+
+                // -------------------------------------------------------------
+
+                REQUIRE( std::get<0>(nested_value) == dummy_enum::second );
+                REQUIRE( std::get<1>(nested_value) == 1 );
+
+                REQUIRE( std::get<2>(nested_value)[0] == 2 );
+                REQUIRE( std::get<2>(nested_value)[1] == 3 );
+                REQUIRE( std::get<2>(nested_value)[2] == 4 );
+
+                REQUIRE( std::get<3>(nested_value)[0].first  == 5 );
+                REQUIRE( std::get<3>(nested_value)[0].second == 6 );
+                REQUIRE( std::get<3>(nested_value)[1].first  == 7 );
+                REQUIRE( std::get<3>(nested_value)[1].second == 8 );
+                REQUIRE( std::get<3>(nested_value)[2].first  == 9 );
+                REQUIRE( std::get<3>(nested_value)[2].second == 10 );
+
+                REQUIRE( std::get<4>(nested_value).first  == 11 );
+                REQUIRE( std::get<4>(nested_value).second == 12 );
+
+                REQUIRE( std::get<5>(nested_value).first  == 13 );
+                REQUIRE( std::get<5>(nested_value).second.first[0] == 14 );
+                REQUIRE( std::get<5>(nested_value).second.first[1] == 15 );
+                REQUIRE( std::get<5>(nested_value).second.first[2] == 16 );
+                REQUIRE( std::get<5>(nested_value).second.second   == 17 );
+
+                REQUIRE( std::get<0>( std::get<6>(nested_value) ) == 18 );
+                REQUIRE( std::get<1>( std::get<6>(nested_value) )[0] == 19 );
+                REQUIRE( std::get<1>( std::get<6>(nested_value) )[1] == 20 );
+                REQUIRE( std::get<1>( std::get<6>(nested_value) )[2] == 21 );
+                REQUIRE( std::get<2>( std::get<6>(nested_value) ).first  == 22);
+                REQUIRE( std::get<2>( std::get<6>(nested_value) ).second == 23);
+
+                // -------------------------------------------------------------
+
+                REQUIRE( ((array[0] == 24) && (array[1] == 25) && (array[2] == 26)) );
+                REQUIRE( value == 27 );
+            }
+        }
     }
-
-    // -------------------------------------------------------------------------
-
-    SECTION( "Unpacking multiple values works" )
-    {
-        nested_value_t nested_value_unpacked;
-        array_t array_unpacked;
-        value_t value_unpacked;
-
-        ct::serialization::unpack_from(bytes.data(), nested_value_unpacked /*, array_unpacked, value_unpacked*/);
-
-        REQUIRE( std::get<0>(nested_value_unpacked) == dummy_enum::second );
-        REQUIRE( std::get<1>(nested_value_unpacked) == 1 );
-
-        REQUIRE( std::get<2>(nested_value_unpacked)[0] == 2 );
-        REQUIRE( std::get<2>(nested_value_unpacked)[1] == 3 );
-        REQUIRE( std::get<2>(nested_value_unpacked)[2] == 4 );
-
-        REQUIRE( std::get<3>(nested_value_unpacked)[0].first  == 5 );
-        REQUIRE( std::get<3>(nested_value_unpacked)[0].second == 6 );
-        REQUIRE( std::get<3>(nested_value_unpacked)[1].first  == 7 );
-        REQUIRE( std::get<3>(nested_value_unpacked)[1].second == 8 );
-        REQUIRE( std::get<3>(nested_value_unpacked)[2].first  == 9 );
-        REQUIRE( std::get<3>(nested_value_unpacked)[2].second == 10 );
-
-        REQUIRE( std::get<4>(nested_value_unpacked).first  == 11 );
-        REQUIRE( std::get<4>(nested_value_unpacked).second == 12 );
-
-        REQUIRE( std::get<5>(nested_value_unpacked).first  == 13 );
-        REQUIRE( std::get<5>(nested_value_unpacked).second.first[0] == 14 );
-        REQUIRE( std::get<5>(nested_value_unpacked).second.first[1] == 15 );
-        REQUIRE( std::get<5>(nested_value_unpacked).second.first[2] == 16 );
-        REQUIRE( std::get<5>(nested_value_unpacked).second.second   == 17 );
-
-        REQUIRE( std::get<0>( std::get<6>(nested_value_unpacked) ) == 18 );
-        REQUIRE( std::get<1>( std::get<6>(nested_value_unpacked) )[0] == 19 );
-        REQUIRE( std::get<1>( std::get<6>(nested_value_unpacked) )[1] == 20 );
-        REQUIRE( std::get<1>( std::get<6>(nested_value_unpacked) )[2] == 21 );
-        REQUIRE( std::get<2>( std::get<6>(nested_value_unpacked) ).first  == 22);
-        REQUIRE( std::get<2>( std::get<6>(nested_value_unpacked) ).second == 23);
-    }
-
 }
-
-template <typename T>
-struct return_type : return_type<decltype(&T::operator())>
-{};
-// For generic types, directly use the result of the signature of its 'operator()'
-
-template <typename ClassType, typename ReturnType, typename... Args>
-struct return_type<ReturnType(ClassType::*)(Args...) const>
-{
-    using type = ReturnType;
-};
 
 TEST_CASE( "Structures Serialization/Deserialization works", "[ser/deser]" )
 {
@@ -256,10 +263,6 @@ TEST_CASE( "Structures Serialization/Deserialization works", "[ser/deser]" )
         );
     };
 
-
-    using lambda_return_type = return_type<decltype(pack)>::type;
-    lambda_return_type bytes;
-
     static const auto unpack = [](const signed char* bytes, Vec3& vec, Color& col)
     {
         ct::serialization::unpack_from(bytes,
@@ -273,7 +276,7 @@ TEST_CASE( "Structures Serialization/Deserialization works", "[ser/deser]" )
     const Vec3  vec = {1.2f, 3.4f, 5.6f};
     const Color col = {165, 178, 254};
 
-    bytes = pack(vec, col);
+    const auto bytes = pack(vec, col);
 
     // -------------------------------------------------------------------------
 
