@@ -1,5 +1,7 @@
 # WIP: Compile-Time utilities library
 
+[![HitCount](http://hits.dwyl.com/inobelar/compiletime-utils.svg)](http://hits.dwyl.com/inobelar/compiletime-utils)
+
 Written with type-traits (structures, with specialization for types) with **extentibility by custom types** in mind.
 
 Written for **c++11**, without such useful things like:
