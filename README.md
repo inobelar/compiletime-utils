@@ -1,6 +1,10 @@
 # WIP: Compile-Time utilities library
 
-[![HitCount](http://hits.dwyl.com/inobelar/compiletime-utils.svg)](http://hits.dwyl.com/inobelar/compiletime-utils)
+<p align="center">
+  <a href="http://hits.dwyl.com/inobelar/compiletime-utils">
+    <img title="HitCount" src="http://hits.dwyl.com/inobelar/compiletime-utils.svg"/>
+  </a>
+</p>
 
 Written with type-traits (structures, with specialization for types) with **extentibility by custom types** in mind.
 
