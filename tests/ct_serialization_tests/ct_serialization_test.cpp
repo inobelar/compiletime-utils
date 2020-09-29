@@ -5,17 +5,34 @@
 
 TEST_CASE( "Compile-time offsets calculation works", "[ser/deser]")
 {
-    constexpr auto offsets = ct::serialization::utils::offsets::get_offsets
-    <
-        std::int8_t, std::int32_t, std::int32_t, std::array<std::int32_t, 3>, std::int64_t
-    >();
+    SECTION( "Flat types offsets check" )
+    {
+        constexpr auto offsets = ct::serialization::utils::offsets::get_offsets
+        <
+            std::int8_t, std::int32_t, std::int32_t, std::array<std::int32_t, 3>, std::int64_t
+        >();
 
-    REQUIRE( offsets.size() == 5 );
-    REQUIRE( offsets[0] == 0 );
-    REQUIRE( offsets[1] == (sizeof(std::int8_t)) );
-    REQUIRE( offsets[2] == (sizeof(std::int8_t)+sizeof(std::int32_t)) );
-    REQUIRE( offsets[3] == (sizeof(std::int8_t)+sizeof(std::int32_t)+sizeof(std::int32_t)) );
-    REQUIRE( offsets[4] == (sizeof(std::int8_t)+sizeof(std::int32_t)+sizeof(std::int32_t)+(sizeof(std::int32_t)*3)) );
+        REQUIRE( offsets.size() == 5 );
+        REQUIRE( offsets[0] == 0 );
+        REQUIRE( offsets[1] == (sizeof(std::int8_t)) );
+        REQUIRE( offsets[2] == (sizeof(std::int8_t)+sizeof(std::int32_t)) );
+        REQUIRE( offsets[3] == (sizeof(std::int8_t)+sizeof(std::int32_t)+sizeof(std::int32_t)) );
+        REQUIRE( offsets[4] == (sizeof(std::int8_t)+sizeof(std::int32_t)+sizeof(std::int32_t)+(sizeof(std::int32_t)*3)) );
+    }
+
+    SECTION( "Nested types offsets check" )
+    {
+        constexpr auto offsets = ct::serialization::utils::offsets::get_offsets
+        <
+            std::pair<std::int32_t, std::int64_t>, std::tuple<std::int8_t, std::array<std::int16_t, 3>, std::int32_t>, std::int64_t
+        >();
+
+        REQUIRE( offsets.size() == 3 );
+        REQUIRE( offsets[0] == 0 );
+        REQUIRE( offsets[1] == (sizeof(std::int32_t)+sizeof(std::int64_t)) );
+        REQUIRE( offsets[2] == (sizeof(std::int32_t)+sizeof(std::int64_t))+(sizeof(std::int8_t)+(sizeof(std::int16_t)*3)+sizeof(std::int32_t)) );
+    }
+
 }
 
 TEST_CASE( "Simple Serialization/Deserialization works", "[ser/deser]" )
