@@ -46,7 +46,7 @@ namespace tests {
     static_assert(std::is_same< nth_type_of<2, bool, int, double>::type, double>::value, "Test failed");
 
 } // namespace tests
-#endif
+#endif // defined(CT_ENABLE_TESTS)
 
 } // namespace utils
 
