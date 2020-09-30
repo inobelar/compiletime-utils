@@ -16,7 +16,7 @@ namespace serialization {
     Written as bunch of nested specialization traits, to make this extendable
     by custom types.
 
-    @note For detailed description see packer_treit, since, historically,
+    @note For detailed description see packer_trait, since, historically,
     unpacking was written after it, and strictly mirrored/opposite to packing.
 
     # Extending by custom types
