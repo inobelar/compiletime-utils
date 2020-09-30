@@ -7,6 +7,8 @@
 #include <vector> // for std::vector<T>
 #include <tuple>  // for std::tuple<Types>
 
+#include <typeinfo> // for typeid(T).name()
+
 #include "ct/utils/ct_utils_index_sequence.hpp"
 
 namespace ct {
@@ -18,6 +20,11 @@ namespace impl {
 // Utility function for making offset-string, from indentation level
 inline std::string o(std::size_t offset) {
     return (offset == 0) ? "" : std::string((offset * 4), ' ');
+}
+
+template <typename T>
+constexpr const char* type_name() {
+    return typeid(T).name();
 }
 
 } // namespace impl
@@ -36,7 +43,7 @@ struct printer_trait< T, typename std::enable_if< std::is_scalar<T>::value == tr
     static auto print_value_impl(const ValueType& value, const std::size_t indent)
         -> typename std::enable_if< std::is_enum<ValueType>::value == false, void>::type
     {
-        std::cout << impl::o(indent) << "<T = " << typeid(ValueType).name() << "> { ";
+        std::cout << impl::o(indent) << "<T = " << impl::type_name<ValueType>() << "> { ";
 
         std::cout << value;
 
@@ -53,7 +60,7 @@ struct printer_trait< T, typename std::enable_if< std::is_scalar<T>::value == tr
         const enum_int_type enum_int = static_cast<enum_int_type>(value);
         // ------------------------------------------------------------------
 
-        std::cout << impl::o(indent) << "<EnumT = " << typeid(ValueType).name() << ", IntType = " << typeid(enum_int_type).name() << "> { ";
+        std::cout << impl::o(indent) << "<EnumT = " << impl::type_name<ValueType>() << ", IntType = " << impl::type_name<enum_int_type>() << "> { ";
 
         std::cout << enum_int;
 
@@ -92,7 +99,7 @@ inline void print_non_scalar_array_items(const T* items, const std::size_t size,
 template <typename T, std::size_t SIZE, typename F>
 inline void print__std_array__wrap(F&& callback, const std::size_t indent)
 {
-    std::cout << impl::o(indent) << "std::array<T = " << typeid(T).name() << ", SIZE = " << SIZE << "> {";
+    std::cout << impl::o(indent) << "std::array<T = " << impl::type_name<T>() << ", SIZE = " << SIZE << "> {";
     std::cout << std::endl;
 
     callback();
@@ -104,7 +111,7 @@ inline void print__std_array__wrap(F&& callback, const std::size_t indent)
 template <typename T, typename F>
 inline void print__std_vector__wrap(F&& callback, const std::size_t size, const std::size_t indent)
 {
-    std::cout << impl::o(indent) << "std::vector<T = " << typeid(T).name() << ", size = " << size << "> {";
+    std::cout << impl::o(indent) << "std::vector<T = " << impl::type_name<T>() << ", size = " << size << "> {";
     std::cout << std::endl;
 
     callback();
@@ -116,7 +123,7 @@ inline void print__std_vector__wrap(F&& callback, const std::size_t size, const 
 template <typename T, typename F>
 inline void print__std_initializer_list__wrap(F&& callback, const std::size_t size, const std::size_t indent)
 {
-    std::cout << impl::o(indent) << "std::initializer_list<T = " << typeid(T).name() << ", size = " << size << "> {";
+    std::cout << impl::o(indent) << "std::initializer_list<T = " << impl::type_name<T>() << ", size = " << size << "> {";
     std::cout << std::endl;
 
     callback();
@@ -262,7 +269,7 @@ struct printer_trait< std::pair<First, Second> >
 
     static void print(const value_t& pair, const std::size_t indent = 0)
     {
-        std::cout << impl::o(indent) << "std::pair<First = " << typeid(First).name() << ", Second = " << typeid(Second).name() << "> {";
+        std::cout << impl::o(indent) << "std::pair<First = " << impl::type_name<First>() << ", Second = " << impl::type_name<Second>() << "> {";
         std::cout << std::endl;
 
         printer_trait<First >::print(pair.first,  indent + 1);
@@ -288,7 +295,7 @@ struct printer_trait< std::tuple<Types...> >
         {
             using dummy_t = int[];
             (void) dummy_t {
-                ( std::cout << typeid(Types).name() << ", ", /* zero for making dummy_t: */ 0) ...
+                ( std::cout << impl::type_name<Types>()  << ", ", /* zero for making dummy_t: */ 0) ...
             };
         }
 
@@ -337,7 +344,7 @@ struct printer_trait< std::tuple<Types...> >
 
         static void print(const value_t& vector, const std::size_t indent = 0)
         {
-            std::cout << impl::o(indent) << "QVector<T = " << typeid(T).name() << "> {";
+            std::cout << impl::o(indent) << "QVector<T = " << impl::type_name<T>() << "> {";
             std::cout << std::endl;
 
             // Print values
