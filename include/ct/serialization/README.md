@@ -2,7 +2,7 @@
 
 Examples of usage: [**in tests**](../../../tests/ct_serialization_tests/ct_serialization_test.cpp)
 
-The main goal of `serialization` sub-section to provide convenient and safe zero-cost `std::memcpy()`-generator functions (`pack()` and `unpack()`), which do strictly the same as carefully-written-by-hand code (explicit boilerplait) - without any extra runtime overhead (even without simple additions for offsets calculation - everything guarantely computed in compile-time). The next goal - to provide convenient (recursive) solution for packing complex nested compsite-types (for which, writing such optimized code manually may be complete nightmare).
+The main goal of `serialization` sub-section to provide convenient and safe zero-cost `std::memcpy()`-generator functions (`pack()` and `unpack()`), which do strictly the same as carefully-written-by-hand code (explicit boilerplait) - without any extra runtime overhead (even without simple additions for offsets calculation - everything guarantely computed in compile-time). The next goal - to provide convenient (recursive) solution for packing complex nested compsite-types (for which, writing such optimized code manually may be complete nightmare - like set of tuples, which contains arrays of pairs).
 
 Implementation uses only known at compile-time information, like types (and `sizeof` for each of them), without touching values. That's why here is supported specialization for `std::array<T, SIZE>` but not `std::vector<T>`, size of which known only in run-time.
 Based on next features:
@@ -20,53 +20,71 @@ Currently `packing`/`unpacking` traits specialized only for the next types (but 
 
 Strictly speaking this is not fully compile-time, since `std::memcpy()` is not `constexpr`, but everything else (offset's, sizes) computed in compile-time.
 
-## Data packing - manually written way
-```c++
-const std::int32_t v0{123};
-const std::int64_t v1{234};
-const float        v2{345.f};
-const double       v3{456.0};
+<details>
+  <summary>Data packing</summary>
 
-constexpr std::size_t BYTES_COUNT = sizeof(std::int32_t) + sizeof(std::int64_t) + sizeof(float) + sizeof(double);
-static std::array<std::int8_t, BYTES_COUNT> buffer;
+  ## Data packing - manually written way
+  ```c++
+  const std::int32_t v0{123};
+  const std::int64_t v1{234};
+  const float        v2{345.f};
+  const double       v3{456.0};
 
-constexpr std::size_t v0_offset = 0;
-constexpr std::size_t v1_offset = v0_offset + sizeof(std::int32_t);
-constexpr std::size_t v2_offset = v1_offset + sizeof(std::int64_t);
-constexpr std::size_t v3_offset = v2_offset + sizeof(float);
+  constexpr std::size_t BYTES_COUNT = sizeof(std::int32_t) + sizeof(std::int64_t) + sizeof(float) + sizeof(double);
+  static std::array<std::int8_t, BYTES_COUNT> buffer;
 
-std::memcpy(buffer.data() + v0_offset, &v0, sizeof(std::int32_t));
-std::memcpy(buffer.data() + v1_offset, &v1, sizeof(std::int64_t));
-std::memcpy(buffer.data() + v2_offset, &v2, sizeof(float));
-std::memcpy(buffer.data() + v3_offset, &v3, sizeof(double));
-```
+  constexpr std::size_t v0_offset = 0;
+  constexpr std::size_t v1_offset = v0_offset + sizeof(std::int32_t);
+  constexpr std::size_t v2_offset = v1_offset + sizeof(std::int64_t);
+  constexpr std::size_t v3_offset = v2_offset + sizeof(float);
 
-## Data packing by using library (case #1)
-```c++
-const std::int32_t v0{123};
-const std::int64_t v1{234};
-const float        v2{345.0f};
-const double       v3{456.0};
+  std::memcpy(buffer.data() + v0_offset, &v0, sizeof(std::int32_t));
+  std::memcpy(buffer.data() + v1_offset, &v1, sizeof(std::int64_t));
+  std::memcpy(buffer.data() + v2_offset, &v2, sizeof(float));
+  std::memcpy(buffer.data() + v3_offset, &v3, sizeof(double));
+  ```
 
-// Perfomance case - packing into static (once-allocated, reusable) buffer
-using byte_buffer = typename ct::serialization::packer_trait<
-    std::int32_t, std::int64_t, float, double
->::info_t::byte_buffer_t;
+  -----
 
-static byte_buffer buffer;
+  ## Data packing by using library (case #1)
+  ```c++
+  const std::int32_t v0{123};
+  const std::int64_t v1{234};
+  const float        v2{345.0f};
+  const double       v3{456.0};
 
-ct::serialization::pack_into(buffer.data(),
-    v0, v1, v2, v3
-);
-```
+  using buffer_t = typename ct::serialization::packer_trait<
+      std::int32_t, std::int64_t, float, double
+  >::info_t::byte_buffer_t;
 
-## Data packing by using library (case #2)
-```c++
-// Common case (implicit types deduction) - packing into created buffer
-const auto buffer = ct::serialization::pack(
-    v0, v1, v2, v3
-);
-```
+  // Perfomance case - packing into static (once-allocated, reusable) buffer
+  static buffer_t buffer;
+
+  ct::serialization::pack_into(buffer.data(),
+      v0, v1, v2, v3
+  );
+  ```
+
+  ## Data packing by using library (case #2)
+  ```c++
+  const std::int32_t v0{123};
+  const std::int64_t v1{234};
+  const float        v2{345.0f};
+  const double       v3{456.0};
+
+  // Common case (implicit types deduction) - packing into created buffer
+  const auto buffer = ct::serialization::pack(
+      v0, v1, v2, v3
+  );
+  ```
+</details>
+
+
+<details>
+  <summary>Data unpacking</summary>
+
+  TODO :)
+</details>
 
 <details>
   <summary>Debug printing example</summary>
