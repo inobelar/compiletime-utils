@@ -9,7 +9,8 @@
 #
 #   - https://unix.stackexchange.com/questions/215234/explanation-of-directives-in-find-printf
 #     - %P - File's name with the name of the starting-point under which it was found removed.
-#            For making #include <file/name.hpp> instead of #include <./file/name.hpp> (in case of %p)
+#            For making #include "file/name.hpp" instead of #include "./file/name.hpp" (in case of %p)
+#            Also it is important for Quom below - includes must be 'local'-style (with ""), not 'global'-style (with <>)
 
 find ./include/ -name "*.hpp" -printf "#include \"%P\"\n" > ./__all_headers.hpp
 
