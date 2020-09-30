@@ -49,7 +49,7 @@ struct offsets_utils
     static constexpr std::size_t accumulate_sizeofs(const offsets_array_t& sizeofs_array, std::size_t curr_idx)
     {
         // First element (at index 0) always have offset 0
-        // Offsets calculation is done recursively, backwards (from `curr_idx` intil 0)
+        // Offsets calculation is done recursively, backwards (from `curr_idx` until 0)
         return (curr_idx == 0) ? 0 : ( sizeofs_array[curr_idx-1] + accumulate_sizeofs(sizeofs_array, curr_idx-1) );
     }
 
