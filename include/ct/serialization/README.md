@@ -16,7 +16,7 @@ Currently `packing`/`unpacking` traits specialized only for the next types (but 
 - raw arrays (`T[SIZE]`) and `std::array<T, SIZE>`
   - Important note: since this is `homo-iconic sequences` (all elements the same type, ordered, placed continuously in memory), here is applied the next optimization: if such sequence contains only `scalar` data - copying done only once (like for single item, since it is safe), otherwise (non-`scalar` types) - processing perfomed for each item.
 - `std::pair<FirstT, SecondT>` and `std::tuple<Types...>`
-  - Since this is `hetero-iconic collection` (all elements ordered, but not placed continuosly in memory, may be various types) - processing always perfomed for independently for each item.
+  - Since this is `hetero-iconic collection` (all elements ordered, but not placed continuosly in memory, may be various types) - processing always perfomed independently for each item.
 
 Strictly speaking this is not fully compile-time, since `std::memcpy()` is not `constexpr`, but everything else (offset's, sizes) computed in compile-time.
 
