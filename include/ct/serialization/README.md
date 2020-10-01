@@ -83,7 +83,63 @@ Strictly speaking this is not fully compile-time, since `std::memcpy()` is not `
 <details>
   <summary>Data unpacking</summary>
 
-  TODO :)
+  ## Data unpacking - manually written way
+  ```c++
+  std::int32_t v0;
+  std::int64_t v1;
+  float        v2;
+  double       v3;
+
+  constexpr std::size_t BYTES_COUNT = sizeof(std::int32_t) + sizeof(std::int64_t) + sizeof(float) + sizeof(double);
+  std::vector<std::int8_t> buffer = { /* received from somewhere, for example over network */ };
+  if(buffer.size() >= BYTES_COUNT)
+  {
+      constexpr std::size_t v0_offset = 0;
+      constexpr std::size_t v1_offset = v0_offset + sizeof(std::int32_t);
+      constexpr std::size_t v2_offset = v1_offset + sizeof(std::int64_t);
+      constexpr std::size_t v3_offset = v2_offset + sizeof(float);
+
+      std::memcpy(&v0, buffer.data() + v0_offset, sizeof(std::int32_t));
+      std::memcpy(&v1, buffer.data() + v1_offset, sizeof(std::int64_t));
+      std::memcpy(&v2, buffer.data() + v2_offset, sizeof(float));
+      std::memcpy(&v3, buffer.data() + v3_offset, sizeof(double));
+  }
+  ```
+
+  -----
+
+  ## Data unpacking by using library (case #1)
+  ```c++
+  std::int32_t v0;
+  std::int64_t v1;
+  float        v2;
+  double       v3;
+
+  std::vector<std::int8_t> buffer = { /* received from somewhere, for example over network */ };
+
+  ct::serialization::unpack_from(buffer.data(),
+      v0, v1, v2, v3
+  );
+  ```
+
+  ## Data unpacking by using library (case #2)
+  ```c++
+  const std::int32_t v0;
+  const std::int64_t v1;
+  const float        v2;
+  const double       v3;
+
+  using buffer_t = typename ct::serialization::packer_trait<
+      std::int32_t, std::int64_t, float, double
+  >::info_t::byte_buffer_t;
+
+  // Strange case, when provided const-size buffer :)
+  buffer_t buffer = { /* received from somewhere, for example over network */ };
+
+  const auto buffer = ct::serialization::unpack(
+      v0, v1, v2, v3
+  );
+  ```
 </details>
 
 <details>
