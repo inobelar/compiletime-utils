@@ -138,7 +138,7 @@ SCENARIO( "Nested Serialization/Deserialization works", "[ser/deser]" )
             >
         >,
 
-        std::tuple< // Sub-tuple (nested
+        std::tuple< // Sub-tuple (nested)
             int,
             std::array<short, 3>,
             std::pair<int, int>
@@ -152,7 +152,6 @@ SCENARIO( "Nested Serialization/Deserialization works", "[ser/deser]" )
 
     GIVEN( "Bytes buffer created before packing" )
     {
-        //
         using byte_array_t = ct::serialization::byte_buffer_t<nested_value_t, array_t, value_t>;
         byte_array_t bytes {0}; // Filled by zeroes, why not
 
@@ -253,7 +252,7 @@ TEST_CASE( "Structures Serialization/Deserialization works", "[ser/deser]" )
     };
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // Custom structures packing
+    // Custom structures packing-functions
 
     static const auto pack = [](const Vec3& vec, const Color& col)
     {
