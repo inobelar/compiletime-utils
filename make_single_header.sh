@@ -30,7 +30,7 @@ find ./include/ -name "*.hpp" -printf "#include \"%P\"\n" > ./__all_headers.hpp
 #     #include <ct/ct_test_equal.hpp>
 #   #endif
 
-python3 -m quom --include_directory ./include/ ./__all_headers.hpp ./ct_utils_lib.hpp
+python3 -m quom --include_directory ./include/ ./__all_headers.hpp ./lib_single_header.hpp
 
 
 # ----------------------------------------------------------

@@ -1,6 +1,6 @@
 # Serialization
 
-Examples of usage: [**in tests**](../../../tests/ct_serialization_tests/ct_serialization_test.cpp)
+Examples of usage: [**in tests**](../../../tests/serialization_tests/ct_serialization_test.cpp)
 
 The main goal of `serialization` sub-section to provide convenient and safe zero-cost `std::memcpy()`-generator functions (`pack()` and `unpack()`), which do strictly the same as carefully-written-by-hand code (explicit boilerplait) - without any extra runtime overhead (even without simple additions for offsets calculation - everything guarantely computed in compile-time). The next goal - to provide convenient (recursive) solution for packing complex nested compsite-types (for which, writing such optimized code manually may be complete nightmare - like set of tuples, which contains arrays of pairs).
 

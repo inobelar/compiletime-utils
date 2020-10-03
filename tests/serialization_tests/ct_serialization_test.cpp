@@ -3,7 +3,7 @@
 #include "ct/serialization/ct_serialization_pack.hpp"
 #include "ct/serialization/ct_serialization_unpack.hpp"
 
-TEST_CASE( "Compile-time offsets calculation works", "[ser/deser]")
+TEST_CASE( "Compile-time offsets calculation works", "[ct][ser/deser]")
 {
     SECTION( "Flat types offsets check" )
     {
@@ -41,7 +41,7 @@ TEST_CASE( "Compile-time offsets calculation works", "[ser/deser]")
 
 }
 
-TEST_CASE( "Simple Serialization/Deserialization works", "[ser/deser]" )
+TEST_CASE( "Compile-time simple Serialization/Deserialization works", "[ct][ser/deser]" )
 {
     // Packing multiple values into fixed-size bytes array (which size known at
     // compile-time, deducted from arguments types)
@@ -117,7 +117,7 @@ TEST_CASE( "Simple Serialization/Deserialization works", "[ser/deser]" )
 
 }
 
-SCENARIO( "Nested Serialization/Deserialization works", "[ser/deser]" )
+SCENARIO( "Nested Serialization/Deserialization works", "[ct][ser/deser]" )
 {
     enum class dummy_enum { first = 0, second = 1, third = 2 };
 
@@ -230,7 +230,7 @@ SCENARIO( "Nested Serialization/Deserialization works", "[ser/deser]" )
     }
 }
 
-TEST_CASE( "Structures Serialization/Deserialization works", "[ser/deser]" )
+TEST_CASE( "Structures Serialization/Deserialization works", "[ct][ser/deser]" )
 {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     // Custom structures definition
