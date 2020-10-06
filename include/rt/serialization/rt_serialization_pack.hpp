@@ -33,14 +33,12 @@ struct param_packer
 {
     static std::size_t pack(std::int8_t* dest, std::size_t offset, const Types& ... values)
     {
-        constexpr std::size_t VALUES_COUNT = sizeof...(Types);
-        using offsets_array_t = std::size_t[VALUES_COUNT];
-
-        const offsets_array_t offsets {
+        using dummy_t = std::size_t[];
+        (void) dummy_t {
             offset += pack_trait<Types>::pack(dest, offset, values) ...
         };
 
-        return offsets[VALUES_COUNT-1]; // last offset
+        return offset;
     }
 };
 

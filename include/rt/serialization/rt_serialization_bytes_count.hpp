@@ -27,17 +27,14 @@ struct byte_count_params
 {
     static std::size_t bytes_count(const Types& ... values)
     {
-        constexpr std::size_t VALUES_COUNT = sizeof...(Types);
-        using array_t = std::size_t[VALUES_COUNT];
-
-        // Note: used `count += bytes_count()` for getting total bytes count
-        // simply from `sizeofs[VALUES_COUNT-1]`. It is faster, then std::accumulate(sizeofs)
-
         std::size_t count = 0;
-        const array_t sizeofs = {
+
+        using dummy_t = std::size_t[];
+        (void) dummy_t {
             count += bytes_count_trait<Types>::bytes_count(values) ...
         };
-        return sizeofs[VALUES_COUNT-1]; // last item - total count
+
+        return count;
     }
 };
 
