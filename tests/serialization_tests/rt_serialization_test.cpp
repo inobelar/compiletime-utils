@@ -62,7 +62,7 @@ TEST_CASE( "Run-time buffer size calculation works", "[rt][ser/deser]")
 }
 
 template <typename ... Args>
-std::vector<std::int8_t> pack_into_bytes(const Args& ... args)
+inline std::vector<std::int8_t> pack_into_bytes(const Args& ... args)
 {
     const std::size_t bytes_count = rt::serialization::bytes_count(args...);
     std::vector<std::int8_t> bytes(bytes_count);
@@ -80,27 +80,27 @@ TEST_CASE( "Run-time simple Serialization/Deserialization works", "[rt][ser/dese
         std::uint32_t{254},
         std::uint64_t{1337},
         float{3.14},
-        double{9.81} // ,
-//        std::array<int, 3>{1, 2, 3}
+        double{9.81},
+        std::array<int, 3>{1, 2, 3}
     );
 
-//    SECTION( "Byte array unpacking is correct" )
-//    {
-//        std::uint16_t v0 = 0;
-//        std::uint32_t v1 = 0;
-//        std::uint64_t v2 = 0;
-//        float         v3 = 0;
-//        double        v4 = 0;
-//        std::array<int, 3> v5 = {0, 0, 0};
+    SECTION( "Byte array unpacking is correct" )
+    {
+        std::uint16_t v0 = 0;
+        std::uint32_t v1 = 0;
+        std::uint64_t v2 = 0;
+        float         v3 = 0;
+        double        v4 = 0;
+        std::array<int, 3> v5 = {0, 0, 0};
 
-//        rt::serialization::unpack(bytes.data(), v0, v1, v2, v3, v4, v5);
+        rt::serialization::unpack(bytes.data(), v0, v1, v2, v3, v4, v5);
 
-//        REQUIRE( v0 ==   42 );
-//        REQUIRE( v1 ==  254 );
-//        REQUIRE( v2 == 1337 );
-//        REQUIRE( v3 == Approx(3.14) );
-//        REQUIRE( v4 == Approx(9.81) );
-//        REQUIRE( ((v5[0] == 1) && (v5[1] == 2) && (v5[2] == 3)) );
-//    }
+        REQUIRE( v0 ==   42 );
+        REQUIRE( v1 ==  254 );
+        REQUIRE( v2 == 1337 );
+        REQUIRE( v3 == Approx(3.14) );
+        REQUIRE( v4 == Approx(9.81) );
+        REQUIRE( ((v5[0] == 1) && (v5[1] == 2) && (v5[2] == 3)) );
+    }
 
 }

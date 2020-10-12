@@ -35,7 +35,7 @@ struct param_unpacker
     {
         using dummy_t = std::size_t[];
         (void) dummy_t {
-            offset += unpack_trait<Types>::unpack(src, offset, values) ...
+            (offset = unpack_trait<Types>::unpack(src, offset, values), /* for debug: */ offset)...
         };
 
         return offset;

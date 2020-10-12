@@ -35,7 +35,7 @@ struct param_packer
     {
         using dummy_t = std::size_t[];
         (void) dummy_t {
-            offset += pack_trait<Types>::pack(dest, offset, values) ...
+            (offset = pack_trait<Types>::pack(dest, offset, values), /* for debug: */ offset) ...
         };
 
         return offset;
