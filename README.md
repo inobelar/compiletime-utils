@@ -13,7 +13,7 @@ Written for **c++11**, without such useful things like:
 - `variable declaration` & `if/switch/for` in `constexpr` functions
 - `std::index_sequence` - [since c++14](https://en.cppreference.com/w/cpp/utility/integer_sequence)
 
-For enabling in-place compile-time tests (useful during hacking) - add `CT_ENABLE_TESTS` define.
+For enabling in-place **compile-time** tests (useful during hacking) - add `CT_ENABLE_TESTS` define.
 
 ## Including into your project
 
@@ -23,13 +23,14 @@ For example:
 - `CMake` - References: [How to properly add include directories with CMake](https://stackoverflow.com/questions/13703647/how-to-properly-add-include-directories-with-cmake), [CMake::include_directories()](https://cmake.org/cmake/help/latest/command/include_directories.html)
   - Add into `CMakeLists.txt`:
     ```cmake
-    set(CT_LIB_INCLUDE_DIR <path/to/compiletime-utils/include/> )
-    target_include_directories( <YOUR_TARGET_NAME> PRIVATE ${CT_LIB_INCLUDE_DIR})
+    set(THIS_LIB_INCLUDE_DIR <path/to/compiletime-utils/include/> )
+    target_include_directories( <YOUR_TARGET_NAME> PRIVATE ${THIS_LIB_INCLUDE_DIR})
     ```
 - `QMake` - In `project_name.pro` file add next line:
   - Add all includes as part of the project:
     ```qmake
     include(<path/to/compiletime-utils/include>/ct.pri)
+    include(<path/to/compiletime-utils/include>/rt.pri)
     ```
   - Add all includes simply into search path:
     ```qmake
@@ -38,4 +39,6 @@ For example:
 - `gcc`/`g++` single-file compilation:
    - `$ gcc -c -std=c++11 -O2 -I <path/to/compiletime-utils/include> -o <app_name> main.cpp`
 
-## [Serialization](./include/ct/serialization/README.md)
+## [CT :: Serialization](./include/ct/serialization/README.md)
+
+## [RT :: Serialization](./include/rt/serialization/README.md)
