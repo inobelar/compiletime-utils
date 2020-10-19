@@ -2,7 +2,7 @@
 
 Examples of usage: [**in tests**](../../../tests/serialization_tests/ct_serialization_test.cpp)
 
-The main goal of `serialization` sub-section to provide convenient and safe zero-cost `std::memcpy()`-generator functions (`pack()` and `unpack()`), which do strictly the same as carefully-written-by-hand code (explicit boilerplait) - without any extra runtime overhead (even without simple additions for offsets calculation - everything guarantely computed in compile-time). The next goal - to provide convenient (recursive) solution for packing complex nested compsite-types (for which, writing such optimized code manually may be complete nightmare - like set of tuples, which contains arrays of pairs).
+The main goal of `ct::serialization` sub-section to provide convenient and safe zero-cost `std::memcpy()`-generator functions (`pack()` and `unpack()`), which do strictly the same as carefully-written-by-hand code (explicit boilerplait) - without any extra runtime overhead (even without simple additions for offsets calculation - everything guarantely computed in compile-time). The next goal - to provide convenient (recursive) solution for packing complex nested compsite-types (for which, writing such optimized code manually may be complete nightmare - like set of tuples, which contains arrays of pairs).
 
 Implementation uses only known at compile-time information, like types (and `sizeof` for each of them), without touching values. That's why here is supported specialization for `std::array<T, SIZE>` but not `std::vector<T>`, size of which known only in run-time.
 Based on next features:
