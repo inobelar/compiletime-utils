@@ -1,9 +1,11 @@
-#ifndef RT__SERIALIZATION__BYTES_COUNT__STD_HPP
-#define RT__SERIALIZATION__BYTES_COUNT__STD_HPP
+#ifndef RT__SERIALIZATION__BYTES_COUNT__STL_HPP
+#define RT__SERIALIZATION__BYTES_COUNT__STL_HPP
 
 #include "rt/serialization/rt_serialization_bytes_count.hpp"
 
 #include "ct/utils/ct_utils_index_sequence.hpp"
+
+#include "rt/serialization/rt_serialization_stl_collection_size.hpp"
 
 // ---------------------------------------------------------
 // Sequence containers
@@ -25,8 +27,6 @@ namespace rt {
 
 namespace serialization {
 
-// -----------------------------------------------------------------------------
-
 // Specialization for std::array
 template <typename T, std::size_t SIZE>
 struct bytes_count_trait< std::array<T, SIZE> >
@@ -36,9 +36,13 @@ struct bytes_count_trait< std::array<T, SIZE> >
     static std::size_t bytes_count(const value_t& array)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : array) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -52,9 +56,13 @@ struct bytes_count_trait< std::vector<T> >
     static std::size_t bytes_count(const value_t& vector)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : vector) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -68,9 +76,13 @@ struct bytes_count_trait< std::deque<T> >
     static std::size_t bytes_count(const value_t& deque)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : deque) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -84,9 +96,13 @@ struct bytes_count_trait< std::forward_list<T> >
     static std::size_t bytes_count(const value_t& list)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : list) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -100,9 +116,13 @@ struct bytes_count_trait< std::list<T> >
     static std::size_t bytes_count(const value_t& list)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : list) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -150,9 +170,13 @@ struct bytes_count_trait< std::initializer_list<T> >
     static std::size_t bytes_count(const value_t& list)
     {
         std::size_t count = 0;
+
+        count += sizeof(stl::collection_size_t); // Size
+
         for(const T& item : list) {
             count += bytes_count_trait<T>::bytes_count(item);
         }
+
         return count;
     }
 };
@@ -161,4 +185,4 @@ struct bytes_count_trait< std::initializer_list<T> >
 
 } // namespace rt
 
-#endif // RT__SERIALIZATION__BYTES_COUNT__STD_HPP
+#endif // RT__SERIALIZATION__BYTES_COUNT__STL_HPP
